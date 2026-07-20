@@ -1,0 +1,39 @@
+# Define substitutions (optional but helps with versioning)
+substitutions:
+  _DEPLOYMENT_NAME: 'first-app'
+  _IMAGE: 'asia-south1-docker.pkg.dev/pvt-stage-1/stage-repo/stage-project-image:v-1.0'
+  _DC_CLUSTER: 'c01'
+options:
+  logging: 'CLOUD_LOGGING_ONLY'
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_IMAGE}', '.']
+  
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE}']
+
+  # Step 3: Apply the initial deployment 
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'apply'
+      - '-f'
+      - 'deployment.yaml'
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=us-central1-c'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_DC_CLUSTER}'
+      - 'CLOUDSDK_CORE_PROJECT=pvt-stage-1'
+# Step 3: Deploy the application to the DC cluster
+# - name: 'gcr.io/cloud-builders/kubectl'
+#   args:
+#     - 'set'
+#     - 'image'
+#     - 'deployment/${_DEPLOYMENT_NAME}'
+#     - '${_DEPLOYMENT_NAME}=${_IMAGE}'
+#   env:
+#     - 'CLOUDSDK_COMPUTE_REGION=asia-south1'
+#     - 'CLOUDSDK_CONTAINER_CLUSTER=${_DC_CLUSTER}'
+# Specify images to build
+images:
+  - '${_IMAGE}' 
