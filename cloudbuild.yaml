@@ -5,6 +5,8 @@ substitutions:
   _DC_CLUSTER: 'pnb-dr-gke-cluster'
 options:
   logging: 'CLOUD_LOGGING_ONLY'
+  workerPool: 'projects/pnb-prod/locations/asia-south2/workerPools/pnb-dr-build-private-pool'
+
 steps:
   # Step 1: Build the Docker image
   - name: 'gcr.io/cloud-builders/docker'
