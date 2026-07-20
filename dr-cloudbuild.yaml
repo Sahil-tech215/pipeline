@@ -1,0 +1,41 @@
+# Define substitutions (optional but helps with versioning)
+substitutions:
+  _DEPLOYMENT_NAME: 'first-app'
+  _IMAGE: 'asia-south2-docker.pkg.dev/pnb-prod/dr-pnb-bou/dr-pnb-bou-dashboard:production-c8fa530'
+  _DC_CLUSTER: 'pnb-dr-gke-cluster'
+options:
+  logging: 'CLOUD_LOGGING_ONLY'
+  workerPool: 'projects/pnb-prod/locations/asia-south2/workerPools/pnb-dr-build-private-pool'
+
+steps:
+  # Step 1: Build the Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', '${_IMAGE}', '.']
+  
+  # Step 2: Push the Docker image to Artifact Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', '${_IMAGE}']
+
+  # Step 3: Apply the initial deployment 
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args:
+      - 'apply'
+      - '-f'
+      - 'deployment.yaml'
+    env:
+      - 'CLOUDSDK_COMPUTE_REGION=asia-south2'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=${_DC_CLUSTER}'
+      - 'CLOUDSDK_CORE_PROJECT=pnb-prod'
+# Step 3: Deploy the application to the DC cluster
+# - name: 'gcr.io/cloud-builders/kubectl'
+#   args:
+#     - 'set'
+#     - 'image'
+#     - 'deployment/${_DEPLOYMENT_NAME}'
+#     - '${_DEPLOYMENT_NAME}=${_IMAGE}'
+#   env:
+#     - 'CLOUDSDK_COMPUTE_REGION=asia-south2'
+#     - 'CLOUDSDK_CONTAINER_CLUSTER=${_DC_CLUSTER}'
+# Specify images to build
+images:
+  - '${_IMAGE}' 
