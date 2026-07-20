@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: nginx-container-2
-        image: asia-south1-docker.pkg.dev/pvt-stage-1/stage-repo/stage-project-image:v-1.0
+        image: asia-south2-docker.pkg.dev/pnb-prod/dr-pnb-bou/dr-pnb-bou-dashboard:production-c8fa530
         ports:
         - containerPort: 80
         resources:
@@ -38,8 +38,7 @@ metadata:
   labels:
     app: nginx-pod
 spec:
-  type: LoadBalancer
-  loadBalancerIP: 192.168.1.241 # Specify an internal IP from your VPC
+  type: ClusterIP
   ports:
   - protocol: TCP
     port: 80
@@ -47,40 +46,3 @@ spec:
   selector:
     app: nginx-pod # Match Deployment labels
   externalTrafficPolicy: Cluster
----
-#For Deployment 1
-apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: hpa-app-deployment
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: app-deployment1
-  minReplicas: 2
-  maxReplicas: 10
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 60   # Target 60% CPU usage
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 70   # Target 70% memory usage
----
-# apiVersion: policy/v1
-# kind: PodDisruptionBudget
-# metadata:
-#   name: pdb-app-deployment
-# spec:
-#   minAvailable: 1
-#   selector:
-#     matchLabels:
-#       app: nginx-pod
-# demo2
