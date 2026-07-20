@@ -1,8 +1,8 @@
 # Define substitutions (optional but helps with versioning)
 substitutions:
   _DEPLOYMENT_NAME: 'first-app'
-  _IMAGE: 'asia-south1-docker.pkg.dev/pvt-stage-1/stage-repo/stage-project-image:v-1.0'
-  _DC_CLUSTER: 'c01'
+  _IMAGE: 'asia-south2-docker.pkg.dev/pnb-prod/dr-pnb-bou/dr-pnb-bou-dashboard:production-c8fa530'
+  _DC_CLUSTER: 'pnb-dr-gke-cluster'
 options:
   logging: 'CLOUD_LOGGING_ONLY'
 steps:
@@ -21,9 +21,9 @@ steps:
       - '-f'
       - 'deployment.yaml'
     env:
-      - 'CLOUDSDK_COMPUTE_REGION=us-central1-c'
+      - 'CLOUDSDK_COMPUTE_REGION=asia-south2'
       - 'CLOUDSDK_CONTAINER_CLUSTER=${_DC_CLUSTER}'
-      - 'CLOUDSDK_CORE_PROJECT=pvt-stage-1'
+      - 'CLOUDSDK_CORE_PROJECT=pnb-prod'
 # Step 3: Deploy the application to the DC cluster
 # - name: 'gcr.io/cloud-builders/kubectl'
 #   args:
@@ -32,7 +32,7 @@ steps:
 #     - 'deployment/${_DEPLOYMENT_NAME}'
 #     - '${_DEPLOYMENT_NAME}=${_IMAGE}'
 #   env:
-#     - 'CLOUDSDK_COMPUTE_REGION=asia-south1'
+#     - 'CLOUDSDK_COMPUTE_REGION=asia-south2'
 #     - 'CLOUDSDK_CONTAINER_CLUSTER=${_DC_CLUSTER}'
 # Specify images to build
 images:
